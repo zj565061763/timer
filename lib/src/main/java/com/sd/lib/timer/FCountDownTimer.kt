@@ -134,12 +134,10 @@ abstract class FCountDownTimer {
         }
 
         override fun onTick(leftTime: Long) {
-            check(Looper.myLooper() === Looper.getMainLooper())
             this@FCountDownTimer.onTick(leftTime)
         }
 
         override fun onFinish() {
-            check(Looper.myLooper() === Looper.getMainLooper())
             this@FCountDownTimer.cancel()
             this@FCountDownTimer.onFinish()
         }
