@@ -169,10 +169,10 @@ private abstract class MainTimer(
     private val _createRunnable = Runnable {
         check(Looper.myLooper() === Looper.getMainLooper())
         synchronized(lock) {
-            check(_timer == null) { "Concurrent !!!" }
-            val duration = checkNotNull(_duration) { "Concurrent !!!" }
-            val interval = checkNotNull(_interval) { "Concurrent !!!" }
+            val duration = _duration ?: return@Runnable
+            val interval = _interval ?: return@Runnable
 
+            check(_timer == null)
             object : CountDownTimer(duration, interval) {
                 override fun onTick(millisUntilFinished: Long) {
                     this@MainTimer.onTick(millisUntilFinished)
