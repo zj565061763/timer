@@ -165,7 +165,7 @@ private abstract class MainTimer {
         val duration = checkNotNull(_duration)
         val interval = checkNotNull(_interval)
 
-        _timer = object : CountDownTimer(duration, interval) {
+        object : CountDownTimer(duration, interval) {
             override fun onTick(millisUntilFinished: Long) {
                 this@MainTimer.onTick(millisUntilFinished)
             }
@@ -173,10 +173,11 @@ private abstract class MainTimer {
             override fun onFinish() {
                 this@MainTimer.onFinish()
             }
+        }.let { timer ->
+            _timer = timer
+            onStart()
+            timer.start()
         }
-
-        onStart()
-        _timer?.start()
     }
 
     fun cancel() {
