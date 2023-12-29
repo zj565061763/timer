@@ -11,7 +11,7 @@ abstract class FDelayTask {
      */
     fun start(delay: Long) {
         require(delay >= 0) { "require delay >= 0" }
-        synchronized(_timer) {
+        synchronized(_timer.lock) {
             _timer.setInterval(delay)
             _timer.start(delay)
         }
