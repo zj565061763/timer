@@ -176,7 +176,6 @@ private abstract class MainTimer(
             val duration = _duration ?: return@Runnable
             val interval = _interval ?: return@Runnable
 
-            check(_timer == null)
             object : CountDownTimer(duration, interval) {
                 override fun onTick(millisUntilFinished: Long) {
                     this@MainTimer.onTick(millisUntilFinished)
