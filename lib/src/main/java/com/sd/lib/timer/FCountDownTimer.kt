@@ -125,7 +125,7 @@ abstract class FCountDownTimer {
 
     private val _mainTimer = object : MainTimer(_lock) {
         override fun onStart() {
-            if (_endTime == null) {
+            if (_isStarted && _endTime == null) {
                 // 第一次启动，记录一下结束的时间点
                 _endTime = SystemClock.elapsedRealtime() + _duration
             }
