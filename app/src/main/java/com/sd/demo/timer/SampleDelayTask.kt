@@ -14,15 +14,19 @@ class SampleDelayTask : ComponentActivity() {
         setContentView(_binding.root)
 
         _binding.btnStart.setOnClickListener {
+            logMsg { "start" }
             _task.start(2_000)
         }
         _binding.btnPause.setOnClickListener {
+            logMsg { "pause" }
             _task.pause()
         }
         _binding.btnResume.setOnClickListener {
+            logMsg { "resume" }
             _task.resume()
         }
         _binding.btnCancel.setOnClickListener {
+            logMsg { "cancel" }
             _task.cancel()
         }
     }
