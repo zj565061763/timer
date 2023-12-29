@@ -119,7 +119,7 @@ abstract class FCountDownTimer {
         }
     }
 
-    private val _mainTimer = object : MainTimer() {
+    private val _mainTimer = object : MainTimer(_lock) {
         override fun onStart() {
             check(Looper.myLooper() === Looper.getMainLooper())
             synchronized(_lock) {
@@ -146,7 +146,9 @@ abstract class FCountDownTimer {
     protected abstract fun onFinish()
 }
 
-private abstract class MainTimer {
+private abstract class MainTimer(
+    private val lock: Any,
+) {
     private val _mainHandler = Handler(Looper.getMainLooper())
     private var _timer: CountDownTimer? = null
 
@@ -166,22 +168,24 @@ private abstract class MainTimer {
 
     private val _createRunnable = Runnable {
         check(Looper.myLooper() === Looper.getMainLooper())
-        check(_timer == null)
-        val duration = checkNotNull(_duration)
-        val interval = checkNotNull(_interval)
+        synchronized(lock) {
+            check(_timer == null) { "Concurrent !!!" }
+            val duration = checkNotNull(_duration) { "Concurrent !!!" }
+            val interval = checkNotNull(_interval) { "Concurrent !!!" }
 
-        object : CountDownTimer(duration, interval) {
-            override fun onTick(millisUntilFinished: Long) {
-                this@MainTimer.onTick(millisUntilFinished)
-            }
+            object : CountDownTimer(duration, interval) {
+                override fun onTick(millisUntilFinished: Long) {
+                    this@MainTimer.onTick(millisUntilFinished)
+                }
 
-            override fun onFinish() {
-                this@MainTimer.onFinish()
+                override fun onFinish() {
+                    this@MainTimer.onFinish()
+                }
+            }.let { timer ->
+                _timer = timer
+                onStart()
+                timer.start()
             }
-        }.let { timer ->
-            _timer = timer
-            onStart()
-            timer.start()
         }
     }
 
