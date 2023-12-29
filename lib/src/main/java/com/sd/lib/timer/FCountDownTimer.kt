@@ -8,9 +8,9 @@ import android.os.SystemClock
 /**
  * 倒计时类
  */
-abstract class FCountDownTimer {
-    private val _lock = Any()
-
+abstract class FCountDownTimer @JvmOverloads constructor(
+    val lock: Any = Any()
+) {
     /** 倒计时是否已经启动 */
     private var _isStarted: Boolean = false
 
@@ -28,7 +28,7 @@ abstract class FCountDownTimer {
      * 倒计时是否已经启动
      */
     fun isStarted(): Boolean {
-        synchronized(_lock) {
+        synchronized(lock) {
             return _isStarted
         }
     }
@@ -37,7 +37,7 @@ abstract class FCountDownTimer {
      * 倒计时是否被暂停
      */
     fun isPaused(): Boolean {
-        synchronized(_lock) {
+        synchronized(lock) {
             return _pauseTime != null
         }
     }
@@ -47,7 +47,7 @@ abstract class FCountDownTimer {
      */
     fun setInterval(interval: Long) {
         require(interval > 0)
-        synchronized(_lock) {
+        synchronized(lock) {
             _interval = interval
         }
     }
@@ -57,7 +57,7 @@ abstract class FCountDownTimer {
      * @param millis 总时长（毫秒）
      */
     fun start(millis: Long) {
-        synchronized(_lock) {
+        synchronized(lock) {
             cancel()
             _isStarted = true
             _duration = millis.coerceAtLeast(0)
@@ -69,7 +69,7 @@ abstract class FCountDownTimer {
      * 暂停
      */
     fun pause() {
-        synchronized(_lock) {
+        synchronized(lock) {
             if (_isStarted && _pauseTime == null) {
                 // 记录暂停的时间点
                 _pauseTime = SystemClock.elapsedRealtime()
@@ -83,7 +83,7 @@ abstract class FCountDownTimer {
      * 恢复
      */
     fun resume() {
-        synchronized(_lock) {
+        synchronized(lock) {
             val pauseTime = _pauseTime ?: return
 
             check(_isStarted)
@@ -115,7 +115,7 @@ abstract class FCountDownTimer {
      * 取消倒计时
      */
     fun cancel() {
-        synchronized(_lock) {
+        synchronized(lock) {
             _mainTimer.cancel()
             _pauseTime = null
             _endTime = null
@@ -123,7 +123,7 @@ abstract class FCountDownTimer {
         }
     }
 
-    private val _mainTimer = object : MainTimer(_lock) {
+    private val _mainTimer = object : MainTimer(lock) {
         override fun onStart() {
             if (_isStarted && _endTime == null) {
                 // 第一次启动，记录一下结束的时间点
