@@ -14,15 +14,19 @@ class SampleCountDown : ComponentActivity() {
         setContentView(_binding.root)
 
         _binding.btnStart.setOnClickListener {
+            logMsg { "start" }
             _timer.start(10_000)
         }
         _binding.btnPause.setOnClickListener {
+            logMsg { "pause" }
             _timer.pause()
         }
         _binding.btnResume.setOnClickListener {
+            logMsg { "resume" }
             _timer.resume()
         }
         _binding.btnCancel.setOnClickListener {
+            logMsg { "cancel" }
             _timer.cancel()
         }
     }
