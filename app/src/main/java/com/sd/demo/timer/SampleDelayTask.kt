@@ -14,7 +14,7 @@ class SampleDelayTask : ComponentActivity() {
         setContentView(_binding.root)
 
         _binding.btnStart.setOnClickListener {
-            _task.start(3_000)
+            _task.start(2_000)
         }
         _binding.btnPause.setOnClickListener {
             _task.pause()
