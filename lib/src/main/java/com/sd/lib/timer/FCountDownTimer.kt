@@ -121,12 +121,9 @@ abstract class FCountDownTimer {
 
     private val _mainTimer = object : MainTimer(_lock) {
         override fun onStart() {
-            check(Looper.myLooper() === Looper.getMainLooper())
-            synchronized(_lock) {
-                if (_endTime == null) {
-                    // 第一次启动，记录一下结束的时间点
-                    _endTime = SystemClock.elapsedRealtime() + _duration
-                }
+            if (_endTime == null) {
+                // 第一次启动，记录一下结束的时间点
+                _endTime = SystemClock.elapsedRealtime() + _duration
             }
         }
 
