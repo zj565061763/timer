@@ -11,32 +11,36 @@ import android.os.SystemClock
 abstract class FCountDownTimer {
     private val _lock = Any()
 
-    /** 倒计时间隔 */
-    private var _interval: Long = 1000
-
     /** 倒计时是否已经启动 */
-    @Volatile
     private var _isStarted: Boolean = false
 
     /** 暂停的时间点 */
-    @Volatile
     private var _pauseTime: Long? = null
-
     /** 结束的时间点 */
     private var _endTime: Long? = null
 
     /** 倒计时总时长 */
     private var _duration: Long = 0
+    /** 倒计时间隔 */
+    private var _interval: Long = 1000
 
     /**
      * 倒计时是否已经启动
      */
-    fun isStarted(): Boolean = _isStarted
+    fun isStarted(): Boolean {
+        synchronized(_lock) {
+            return _isStarted
+        }
+    }
 
     /**
      * 倒计时是否被暂停
      */
-    fun isPaused(): Boolean = _pauseTime != null
+    fun isPaused(): Boolean {
+        synchronized(_lock) {
+            return _pauseTime != null
+        }
+    }
 
     /**
      * 设置倒计时间隔，默认1000毫秒
