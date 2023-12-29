@@ -112,10 +112,12 @@ abstract class FCountDownTimer {
      */
     fun cancel() {
         synchronized(_lock) {
-            _mainTimer.cancel()
-            _pauseTime = null
-            _endTime = null
-            _isStarted = false
+            if (_isStarted) {
+                _mainTimer.cancel()
+                _pauseTime = null
+                _endTime = null
+                _isStarted = false
+            }
         }
     }
 
