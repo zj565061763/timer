@@ -115,7 +115,6 @@ abstract class FCountDownTimer {
             _mainTimer.cancel()
             _pauseTime = null
             _endTime = null
-            _duration = 0
             _isStarted = false
         }
     }
