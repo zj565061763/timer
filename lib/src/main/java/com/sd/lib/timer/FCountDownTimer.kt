@@ -152,7 +152,7 @@ abstract class FCountDownTimer {
 private abstract class MainTimer(
     private val lock: Any,
 ) {
-    private val _mainHandler = Handler(Looper.getMainLooper())
+    private var _handler: Handler? = null
     private var _timer: CountDownTimer? = null
 
     private var _duration: Long? = null
@@ -165,7 +165,8 @@ private abstract class MainTimer(
         if (Looper.myLooper() === Looper.getMainLooper()) {
             _createRunnable.run()
         } else {
-            _mainHandler.post(_createRunnable)
+            val handler = _handler ?: Handler(Looper.getMainLooper()).also { _handler = it }
+            handler.post(_createRunnable)
         }
     }
 
@@ -193,11 +194,16 @@ private abstract class MainTimer(
     }
 
     fun cancel() {
-        _mainHandler.removeCallbacks(_createRunnable)
+        _handler?.let {
+            it.removeCallbacks(_createRunnable)
+            _handler = null
+        }
+
         _timer?.let {
             it.cancel()
             _timer = null
         }
+
         _duration = null
         _interval = null
     }
