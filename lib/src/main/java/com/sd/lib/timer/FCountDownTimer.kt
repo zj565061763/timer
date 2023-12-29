@@ -188,7 +188,7 @@ private abstract class MainTimer(
             }.let { timer ->
                 _timer = timer
                 onStart()
-                timer.start()
+                _timer?.start()
             }
         }
     }
