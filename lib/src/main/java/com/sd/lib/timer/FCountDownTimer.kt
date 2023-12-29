@@ -9,6 +9,8 @@ import android.os.SystemClock
  * 倒计时类
  */
 abstract class FCountDownTimer {
+    private val _lock = Any()
+
     /** 倒计时间隔 */
     private var _interval: Long = 1000
 
@@ -39,45 +41,48 @@ abstract class FCountDownTimer {
     /**
      * 设置倒计时间隔，默认1000毫秒
      */
-    @Synchronized
     fun setInterval(interval: Long) {
         require(interval > 0)
-        _interval = interval
+        synchronized(_lock) {
+            _interval = interval
+        }
     }
 
     /**
      * 开始倒计时
      * @param millis 总时长（毫秒）
      */
-    @Synchronized
     fun start(millis: Long) {
-        cancel()
-        _isStarted = true
-        _duration = millis.coerceAtLeast(0)
-        _mainTimer.start(_duration, _interval)
+        synchronized(_lock) {
+            cancel()
+            _isStarted = true
+            _duration = millis.coerceAtLeast(0)
+            _mainTimer.start(_duration, _interval)
+        }
     }
 
     /**
      * 暂停
      */
-    @Synchronized
     fun pause() {
-        if (!_isStarted) return
-        if (_pauseTime == null) {
-            // 记录暂停的时间点
-            _pauseTime = SystemClock.elapsedRealtime()
-            // 取消Timer
-            _mainTimer.cancel()
+        synchronized(_lock) {
+            if (_isStarted && _pauseTime == null) {
+                // 记录暂停的时间点
+                _pauseTime = SystemClock.elapsedRealtime()
+                // 取消Timer
+                _mainTimer.cancel()
+            }
         }
     }
 
     /**
      * 恢复
      */
-    @Synchronized
     fun resume() {
-        if (!_isStarted) return
-        _pauseTime?.let { pauseTime ->
+        synchronized(_lock) {
+            val pauseTime = _pauseTime ?: return
+
+            check(_isStarted)
             _pauseTime = null
 
             val endTime = _endTime
@@ -105,19 +110,20 @@ abstract class FCountDownTimer {
     /**
      * 取消倒计时
      */
-    @Synchronized
     fun cancel() {
-        _mainTimer.cancel()
-        _pauseTime = null
-        _endTime = null
-        _duration = 0
-        _isStarted = false
+        synchronized(_lock) {
+            _mainTimer.cancel()
+            _pauseTime = null
+            _endTime = null
+            _duration = 0
+            _isStarted = false
+        }
     }
 
     private val _mainTimer = object : MainTimer() {
         override fun onStart() {
             check(Looper.myLooper() === Looper.getMainLooper())
-            synchronized(this@FCountDownTimer) {
+            synchronized(_lock) {
                 if (_endTime == null) {
                     // 第一次启动，记录一下结束的时间点
                     _endTime = SystemClock.elapsedRealtime() + _duration
