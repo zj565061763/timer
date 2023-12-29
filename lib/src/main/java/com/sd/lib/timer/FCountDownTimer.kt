@@ -10,6 +10,7 @@ import android.os.SystemClock
  */
 abstract class FCountDownTimer {
     private val _lock = Any()
+
     /** 倒计时是否已经启动 */
     private var _isStarted: Boolean = false
 
